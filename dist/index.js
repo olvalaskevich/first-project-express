@@ -11,7 +11,7 @@ const products = [{ id: '1', title: 'tomato' }, { id: '2', title: 'orange' }, { 
 const adresses = [{ id: '1', value: 'Pobedy' }, { id: '2', value: 'Raduznaja' }, { id: '3', value: 'Nzavicimosty' }];
 const parserMiddleware = (0, body_parser_1.default)({});
 app.use(parserMiddleware);
-// get-запросы
+// get-запросы products
 app.get('/products', (req, res) => {
     if (req.query.title) {
         let resultProducts = products.filter((p) => p.title.includes(req.query.title.toString()));
@@ -30,8 +30,15 @@ app.get('/products/:product', (req, res) => {
         res.send(404);
     }
 });
+// get-запросы adresses
 app.get('/adresses', (req, res) => {
-    res.send(adresses);
+    if (req.query.value) {
+        let resultAdresses = adresses.filter((p) => p.value.includes(req.query.value.toString()));
+        res.send(resultAdresses);
+    }
+    else {
+        res.send(adresses);
+    }
 });
 app.get('/adresses/:id', (req, res) => {
     let adress = adresses.find((p) => p.id === req.params.id);
@@ -42,7 +49,7 @@ app.get('/adresses/:id', (req, res) => {
         res.send(404);
     }
 });
-// delete-запросы
+// delete-запросы products & adresses
 app.delete('/products/:productId', (req, res) => {
     let product = products.find((p) => p.id === req.params.productId);
     if (product) {
@@ -54,17 +61,43 @@ app.delete('/products/:productId', (req, res) => {
         res.send(404);
     }
 });
-// post-запросы
+app.delete('/adresses/:adressId', (req, res) => {
+    let adress = adresses.find((p) => p.id === req.params.adressId);
+    if (adress) {
+        let indexAdress = adresses.indexOf(adress);
+        adresses.splice(indexAdress, 1);
+        res.send(adresses);
+    }
+    else {
+        res.send(404);
+    }
+});
+// post-запросы products & adresses
 app.post('/products', (req, res) => {
     products.push(req.body);
     res.status(201).send(req.body);
 });
-// put-запросы
+app.post('/adresses', (req, res) => {
+    adresses.push(req.body);
+    res.status(201).send(req.body);
+});
+// put-запросы products & adresses
 app.put('/products', (req, res) => {
     let productUpdate = products.find((p) => p.id === req.body.id);
     if (productUpdate) {
         let index = products.indexOf(productUpdate);
         products.splice(index, 1, req.body);
+        res.send(req.body);
+    }
+    else {
+        res.send(404);
+    }
+});
+app.put('/adresses', (req, res) => {
+    let adressUpdate = adresses.find((p) => p.id === req.body.id);
+    if (adressUpdate) {
+        let index = adresses.indexOf(adressUpdate);
+        adresses.splice(index, 1, req.body);
         res.send(req.body);
     }
     else {

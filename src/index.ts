@@ -11,7 +11,7 @@ const parserMiddleware=bodyParser({})
 app.use(parserMiddleware)
 
 
-// get-запросы
+// get-запросы products
 app.get('/products', (req:Request, res:Response) => {
     if (req.query.title){
         let resultProducts=products.filter((p)=>p.title.includes(req.query.title.toString()))
@@ -32,8 +32,16 @@ app.get('/products/:product', (req:Request, res:Response) => {
     }
 
 })
+
+// get-запросы adresses
 app.get('/adresses', (req:Request, res:Response) => {
-    res.send(adresses)
+    if (req.query.value){
+        let resultAdresses=adresses.filter((p)=>p.value.includes(req.query.value.toString()))
+        res.send(resultAdresses)
+    }
+    else{
+        res.send(adresses)
+    }
 })
 app.get('/adresses/:id', (req:Request, res:Response) => {
     let adress=adresses.find((p)=>p.id===req.params.id)
@@ -46,7 +54,7 @@ app.get('/adresses/:id', (req:Request, res:Response) => {
 
 })
 
-// delete-запросы
+// delete-запросы products & adresses
 app.delete('/products/:productId', (req:Request, res:Response) => {
     let product=products.find((p)=>p.id===req.params.productId)
     if (product){
@@ -58,15 +66,31 @@ app.delete('/products/:productId', (req:Request, res:Response) => {
         res.send(404)
     }
 })
+app.delete('/adresses/:adressId', (req:Request, res:Response) => {
+    let adress=adresses.find((p)=>p.id===req.params.adressId)
+    if (adress){
+        let indexAdress=adresses.indexOf(adress)
+        adresses.splice(indexAdress,1)
+        res.send(adresses)
+    }
+    else {
+        res.send(404)
+    }
+})
 
-// post-запросы
+// post-запросы products & adresses
 app.post('/products', (req:Request, res:Response)=>{
     products.push(req.body)
     res.status(201).send(req.body)
     }
 )
+app.post('/adresses', (req:Request, res:Response)=>{
+        adresses.push(req.body)
+        res.status(201).send(req.body)
+    }
+)
 
-// put-запросы
+// put-запросы products & adresses
 app.put('/products', (req:Request, res:Response)=>{
     let productUpdate=products.find((p)=>p.id===req.body.id)
     if (productUpdate){
@@ -77,6 +101,18 @@ app.put('/products', (req:Request, res:Response)=>{
     else{
         res.send(404)
     }
+    }
+)
+app.put('/adresses', (req:Request, res:Response)=>{
+        let adressUpdate=adresses.find((p)=>p.id===req.body.id)
+        if (adressUpdate){
+            let index=adresses.indexOf(adressUpdate)
+            adresses.splice(index,1,req.body)
+            res.send(req.body)
+        }
+        else{
+            res.send(404)
+        }
     }
 )
 
