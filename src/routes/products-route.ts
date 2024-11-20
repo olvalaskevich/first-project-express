@@ -1,21 +1,16 @@
 import {Request, Response, Router} from "express";
+import {productsRepo} from "../repositiries/products-repository";
 
-const products=[{id:'1', title:'tomato'}, {id:'2', title:'orange'}, {id:'3', title:'bread'}]
 
 export const productsRouter=Router()
 
 productsRouter.get('/', (req:Request, res:Response) => {
-    if (req.query.title){
-        let resultProducts=products.filter((p)=>p.title.includes(req.query.title.toString()))
-        res.send(resultProducts)
-    }
-    else{
-        res.send(products)
-    }
-
+    let params=req.query.title?toString():undefined;
+    let findProducts=productsRepo.findProducts(params)
+    res.send(findProducts)
 })
 productsRouter.get('/:product', (req:Request, res:Response) => {
-    let product=products.find((p)=>p.title===req.params.product)
+    let product=productsRepo.findProduct(req.params.product)
     if (product){
         res.send(product)
     }
@@ -25,26 +20,23 @@ productsRouter.get('/:product', (req:Request, res:Response) => {
 
 })
 productsRouter.delete('/:productId', (req:Request, res:Response) => {
-    let product=products.find((p)=>p.id===req.params.productId)
+    let product=productsRepo.deleteProduct(req.params.productId)
     if (product){
-        let indexProduct=products.indexOf(product)
-        products.splice(indexProduct,1)
-        res.send(products)
+        res.send(product)
     }
     else {
         res.send(404)
     }
 })
 productsRouter.post('/', (req:Request, res:Response)=>{
-        products.push(req.body)
-        res.status(201).send(req.body)
+    let newProduct=productsRepo.createProduct(req.body)
+    if (newProduct)
+        res.status(201).send(newProduct)
     })
 productsRouter.put('/', (req:Request, res:Response)=>{
-        let productUpdate=products.find((p)=>p.id===req.body.id)
+        let productUpdate=productsRepo.updateProduct(req.body)
         if (productUpdate){
-            let index=products.indexOf(productUpdate)
-            products.splice(index,1,req.body)
-            res.send(req.body)
+            res.send(productUpdate)
         }
         else{
             res.send(404)
