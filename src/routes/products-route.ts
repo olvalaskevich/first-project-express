@@ -1,18 +1,18 @@
 import {Request, Response, Router} from "express";
-import {productsRepo} from "../repositiries/products-repository";
+import {productsRepo} from "../repositiries/products-db-repository";
 import {body} from "express-validator";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 
 
 export const productsRouter=Router()
 const titleValidation=body('title').trim().isLength({min:3, max:20}).withMessage('Length should be from 3 to 20 symbols')
-productsRouter.get('/', (req:Request, res:Response) => {
-    let params=req.query.title?toString():undefined;
-    let findProducts=productsRepo.findProducts(params)
+productsRouter.get('/', async (req:Request, res:Response) => {
+    let title=req.query.title?toString():undefined;
+    let findProducts=await productsRepo.findProducts(title)
     res.send(findProducts)
 })
-productsRouter.get('/:product', (req:Request, res:Response) => {
-    let product=productsRepo.findProduct(req.params.product)
+productsRouter.get('/:product', async (req:Request, res:Response) => {
+    let product=await productsRepo.findProduct(req.params.product)
     if (product){
         res.send(product)
     }
@@ -21,10 +21,10 @@ productsRouter.get('/:product', (req:Request, res:Response) => {
     }
 
 })
-productsRouter.delete('/:productId', (req:Request, res:Response) => {
-    let product=productsRepo.deleteProduct(req.params.productId)
+productsRouter.delete('/:productId', async (req:Request, res:Response) => {
+    let product= productsRepo.deleteProduct(req.params.productId)
     if (product){
-        res.send(product)
+        res.send(200)
     }
     else {
         res.send(404)
@@ -33,17 +33,17 @@ productsRouter.delete('/:productId', (req:Request, res:Response) => {
 productsRouter.post('/',
     titleValidation,
     inputValidationMiddleware,
-    (req:any, res:any)=>{
-            let newProduct=productsRepo.createProduct(req.body)
+    async (req:any, res:any)=>{
+            let newProduct=await productsRepo.createProduct(req.body)
             if (newProduct)
                 res.status(201).send(newProduct)
     })
 productsRouter.put('/',
     titleValidation,
     inputValidationMiddleware,
-    (req:any, res:any)=>{
+    async (req:any, res:any)=>{
             let productUpdate=productsRepo.updateProduct(req.body)
             if (productUpdate){
-                res.send(productUpdate)
+                res.send(200)
             }
     })
