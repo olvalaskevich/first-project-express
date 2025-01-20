@@ -1,8 +1,9 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import {productsRouter} from "./routes/products-route";
-import {adressesRouter} from "./routes/adresses-route";
 import {runDb} from "./repositiries/db";
+
+
 
 const app = express()
 const port = process.env.PORT || 5000
