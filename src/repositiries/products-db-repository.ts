@@ -1,33 +1,35 @@
-import {client} from "./db";
+import {dbShop} from "./db";
+import {InsertOneResult} from "mongodb";
 
 export type ProductType={
     id:string
     title:string
 }
+
 export const productsRepo={
     async findProducts(title:string|undefined):Promise<ProductType[]>{
         if (title){
-            return await client.db("shop").collection<ProductType>("products").find({title: {$regex: title}}).toArray()
+            return await dbShop.find({title: {$regex: title}}).toArray()
         }
         else{
-            return await client.db("shop").collection<ProductType>("products").find({}).toArray()
+            return await dbShop.find({}).toArray()
         }
     },
     async findProduct(productId):ProductType|undefined{
-        return client.db("shop").collection<ProductType>("products").findOne({id:productId})
+        return await dbShop.findOne({id:productId})
     },
-    async deleteProduct(productId):boolean{
-        let result=await client.db("shop").collection<ProductType>("products").deleteOne({id:productId})
+    async deleteProduct(productId):Promise<boolean>{
+        let result=await dbShop.deleteOne({id:productId})
         return result.deletedCount===1
 
     },
-    async createProduct(newProduct):ProductType{
+    async createProduct(newProduct):Promise<InsertOneResult<ProductType>>{
         if (newProduct){
-            return client.db("shop").collection<ProductType>("products").insertOne(newProduct)
+            return dbShop.insertOne(newProduct)
         }
     },
-    async updateProduct(productBody):boolean{
-        let result= await client.db("shop").collection<ProductType>("products").updateOne({id:productBody.id}, {$set:{title:productBody.title}})
+    async updateProduct(productBody):Promise<boolean>{
+        let result= await dbShop.updateOne({id:productBody.id}, {$set:{title:productBody.title}})
         return result.matchedCount===1
     }
 }
