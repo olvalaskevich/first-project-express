@@ -12,7 +12,6 @@ const port = process.env.PORT || 5000
 const parserMiddleware = bodyParser({})
 app.use(parserMiddleware)
 app.use('/products', productsRouter)
-// app.use('/adresses', adressesRouter)
 
 const startApp=async ()=>{
     await runDb()
